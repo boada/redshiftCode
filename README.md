@@ -26,7 +26,7 @@ Plots and text file logging redshift measurements will be written under results/
 An example spectrum in FITS table format is included to play with.
 
 ## Authors
-- Matt Hilton 
+- Matt Hilton (University of KwaZulu-Natal)
 - Steven Boada (Texas A&M University)
 
 ## License
