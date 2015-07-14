@@ -32,6 +32,7 @@ import pyfits
 import numpy
 import pylab
 import matplotlib.patches as patches
+import IPython
 from astLib import astSED
 from astLib import astStats
 from astLib import astWCS
