@@ -1,1 +1,7 @@
-### Vim ###[._]*.s[a-w][a-z][._]s[a-w][a-z]*.un~Session.vim.netrwhist*~*.swp*.fitsbadlines.dat*.csv/pyraftest_files//uparm/spec1d_IRAF
+*.pyc
+*.fits
+*.hdf5
+*.swp
+.DS_Store
+/spec_1d_IRAF/
+
