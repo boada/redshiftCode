@@ -168,6 +168,8 @@ class App:
             self.objectSpecFileName = objectSpecFileNames[
                 self.currentSpecFileIndex]  # for plot titles etc.
 
+            self.fiberNumber = len(self.obj)
+
         # List of feature names in spectralFeaturesCatalogue to plot
         self.plotFeatures = []
 
@@ -266,7 +268,8 @@ class App:
         self.fibernumberLabel.grid(row=1, column=0)
         self.fibernumberScale = Tkinter.Scale(self.fiberFrame,
                                               orient=Tkinter.HORIZONTAL,
-                                              length=300, from_=1, to=246,
+                                              length=300, from_=1,
+                                              to=self.fiberNumber,
                                               tickinterval=60,
                                               command=None,
                                               variable=self.fibernumberVar,
@@ -312,7 +315,8 @@ class App:
         # Initial Smoothing
         self.smoothScale.set(5)
         x = self.smoothScale.get()
-        self.objSED = self.obj[246-self.fibernumberScale.get()]['object']
+        self.objSED = self.obj[self.fiberNumber -
+                self.fibernumberScale.get()]['object']
         self.unsmoothedObjFlux = self.objSED.flux[:]
         self.objSED.flux = self.unsmoothedObjFlux[:]
         self.objSED.smooth(x)
@@ -479,10 +483,13 @@ class App:
         pylab.figure(figsize=(12, 8))
 
         # Do initial plot
-        self.updatePlot(self.obj[246-self.fibernumberScale.get()]['object'],
+        self.updatePlot(self.obj[self.fiberNumber -
+            self.fibernumberScale.get()]['object'],
                         self.templates[self.templateRadioVar.get()],
-                        self.obj[246-self.fibernumberScale.get()]['sky'],
-                        self.obj[246-self.fibernumberScale.get()]['error'],
+                        self.obj[self.fiberNumber -
+                            self.fibernumberScale.get()]['sky'],
+                        self.obj[self.fiberNumber -
+                            self.fibernumberScale.get()]['error'],
                         self.redshiftScaleVar.get(),
                         tempLabel=os.path.split(templateLabels[
                             self.templateRadioVar.get()])[-1],
@@ -507,7 +514,8 @@ class App:
         """ Smooths the object spectrum when the smooth slider is updated
 
         """
-        self.objSED = self.obj[246-self.fibernumberScale.get()]['object']
+        self.objSED = self.obj[self.fiberNumber -
+                self.fibernumberScale.get()]['object']
         #self.unsmoothedObjFlux = self.objSED.flux[:]
         #self.objSED.flux = self.unsmoothedObjFlux[:]
         self.objSED.smooth(self.smoothScale.get())
@@ -525,10 +533,13 @@ class App:
         self.smoothScale.set(self.smoothScaleVar.get() - 1)
 
     def changeFiber(self):
-        self.updatePlot(self.obj[246-self.fibernumberScale.get()]['object'],
+        self.updatePlot(self.obj[self.fiberNumber -
+            self.fibernumberScale.get()]['object'],
                         self.templates[self.templateRadioVar.get()],
-                        self.obj[246-self.fibernumberScale.get()]['sky'],
-                        self.obj[246-self.fibernumberScale.get()]['error'],
+                        self.obj[self.fiberNumber -
+                            self.fibernumberScale.get()]['sky'],
+                        self.obj[self.fiberNumber -
+                            self.fibernumberScale.get()]['error'],
                         self.redshiftScaleVar.get(),
                         tempLabel=os.path.split(templateLabels[
                             self.templateRadioVar.get()])[-1],
@@ -653,7 +664,8 @@ class App:
                 self.convertToIRAFFormat():
             print "--> cross correlating " + irafFileName + " ..."
 
-            self.skySED = self.obj[246-self.fibernumberScale.get()]['sky']
+            self.skySED = self.obj[self.fiberNumber -
+                    self.fibernumberScale.get()]['sky']
 
             # Mask prominent sky emission lines
             if self.skySED is None:
@@ -788,12 +800,15 @@ class App:
 
         #idlfits = pyfits.open(self.objectFileName)
 
-        fluxData = self.obj[246-self.fibernumberScale.get()]['object'].flux
+        fluxData = self.obj[self.fiberNumber -\
+                self.fibernumberScale.get()]['object'].flux
         wavelengthData =\
-        self.obj[246-self.fibernumberScale.get()]['object'].wavelength
-        skyData = self.obj[246-self.fibernumberScale.get()]['sky'].flux
+        self.obj[self.fiberNumber -
+                self.fibernumberScale.get()]['object'].wavelength
+        skyData = self.obj[self.fiberNumber -
+                self.fibernumberScale.get()]['sky'].flux
 
-        print 246-self.fibernumberScale.get()
+        print self.fiberNumber - self.fibernumberScale.get()
         print fluxData.mean()
 
         #if fluxData.mean() < 100:
@@ -1341,10 +1356,13 @@ class App:
         pylab.legend(loc="upper right")
 
     def redrawPlot(self):
-        self.updatePlot(self.obj[246-self.fibernumberScale.get()]['object'],
+        self.updatePlot(self.obj[self.fiberNumber -
+            self.fibernumberScale.get()]['object'],
                 self.templates[self.templateRadioVar.get()],
-                self.obj[246-self.fibernumberScale.get()]['sky'],
-                self.obj[246-self.fibernumberScale.get()]['error'],
+                self.obj[self.fiberNumber -
+                    self.fibernumberScale.get()]['sky'],
+                self.obj[self.fiberNumber -
+                    self.fibernumberScale.get()]['error'],
                 self.redshiftScaleVar.get(),
                 tempLabel=os.path.split(templateLabels[
                     self.templateRadioVar.get()])[-1],
