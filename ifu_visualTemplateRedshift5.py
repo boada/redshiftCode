@@ -703,8 +703,6 @@ class App:
                         else:
                             lastPix = max(badPix)
                         lines.append([badPix[i], lastPix])
-                    #outFile=file("/opt/iraf_extras/rvsao-2.8.1/lib/badlines.dat",
-                #        "w")
                 outFile = file("badlines.dat", "w")
                 for line in lines:
                     print('Badlines updated')
@@ -713,10 +711,6 @@ class App:
                                   str(self.skySED.wavelength[line[1]]+10) +\
                                   "\n")
                 outFile.close()
-
-                # Cross correlate with SDSS galaxy templates
-                #for zStep in range(0,9):
-                #z=0.2*zStep
 
             if self.ignoreEmission.get() == 1:
                 chop = 'y'
