@@ -370,6 +370,17 @@ class App:
             command=self.plotSkyChanged)
         self.plotSkyCheckButton.grid(row=1, column=13)
 
+        # Turn Error plotting on/off
+        self.plotErrorCheckVar = Tkinter.IntVar()
+        self.plotErrorLabel = Tkinter.Label(self.smoothFrame, text="Plot Error",
+                                          width=10, anchor=Tkinter.E)
+        self.plotErrorLabel.grid(row=1, column=14)
+        self.plotErrorCheckButton = Tkinter.Checkbutton(
+            self.smoothFrame,
+            variable=self.plotErrorCheckVar,
+            command=self.plotErrorChanged)
+        self.plotErrorCheckButton.grid(row=1, column=15)
+
         # Templates frame
         # Radio buttons used to select template
         self.templateRadioVar = Tkinter.IntVar()
@@ -471,6 +482,7 @@ class App:
         self.updatePlot(self.obj[246-self.fibernumberScale.get()]['object'],
                         self.templates[self.templateRadioVar.get()],
                         self.obj[246-self.fibernumberScale.get()]['sky'],
+                        self.obj[246-self.fibernumberScale.get()]['error'],
                         self.redshiftScaleVar.get(),
                         tempLabel=os.path.split(templateLabels[
                             self.templateRadioVar.get()])[-1],
@@ -516,6 +528,7 @@ class App:
         self.updatePlot(self.obj[246-self.fibernumberScale.get()]['object'],
                         self.templates[self.templateRadioVar.get()],
                         self.obj[246-self.fibernumberScale.get()]['sky'],
+                        self.obj[246-self.fibernumberScale.get()]['error'],
                         self.redshiftScaleVar.get(),
                         tempLabel=os.path.split(templateLabels[
                             self.templateRadioVar.get()])[-1],
@@ -1010,6 +1023,7 @@ class App:
 
         # Load the IFU data -- Row-stacked spectra
         odata = oimg[1].data
+        oError = oimg[2].data
         odata_dim = odata.shape
         wcs = astWCS.WCS(objectFileName, extensionName=1)
         owavelengthStartEnd = wcs.getImageMinMaxWCSCoords()[0:2]
@@ -1039,6 +1053,7 @@ class App:
         RSS = []
         for i in range(int(fiberNumber[1])):
             oflux = odata[i] - oskyflux
+            oErrorFlux = oError[i]
             #oflux = odata[i]
 
             # Mask out extreme values in spectrum
@@ -1053,8 +1068,10 @@ class App:
             #objSED.flux = objSED.flux / objSED.flux.max()
 
             skySED = astSED.SED(wavelength=owavelengthRange, flux=oskyflux)
+            errSED = astSED.SED(wavelength=owavelengthRange, flux=oErrorFlux)
 
-            RSS.append({'object': objSED, 'sky': skySED})
+
+            RSS.append({'object': objSED, 'sky': skySED, 'error' : errSED})
         return RSS
         #return {'object': objSED, 'sky': skySED}
 
@@ -1127,6 +1144,14 @@ class App:
         pylab.clf()
         self.redrawPlot()
 
+    def plotErrorChanged(self):
+        """ Clears figure for if we're redrawing sky subplot or not. Use if we
+        change norm method too.
+
+        """
+        pylab.clf()
+        self.redrawPlot()
+
     def maskLines(self, objSED, skySED):
         # Mask prominent sky emission lines
         if skySED is None:
@@ -1180,8 +1205,10 @@ class App:
 
             return objSED
 
-    def updatePlot(self, objSED, tempSED, skySED, redshift, tempLabel=None,
-                   redrawSky=True, redrawFeatures=False, plotFeatures=[]):
+    def updatePlot(self, objSED, tempSED, skySED, errSED, redshift,
+            tempLabel=None, redrawSky=True, redrawFeatures=False,
+            plotFeatures=[]):
+
         """ Updates the pylab plot of the object spectrum with template
         overlaid.
 
@@ -1300,6 +1327,12 @@ class App:
                                   facecolor=(0.8, 0.8, 0.8), linewidth=1)
             pylab.gca().add_patch(c)
 
+        if redrawSky and self.plotErrorCheckVar.get() == 1:
+            if errSED is not None:
+                pylab.plot(errSED.wavelength,
+                           errSED.flux / errSED.flux.max() * 0.5, '-',
+                           c='#467821', label='Error', zorder=0)
+
         # Finish drawing the object spectrum plot
         pylab.ylim(0, 1.2)
         pylab.xlim(xMin, xMax)
@@ -1311,6 +1344,7 @@ class App:
         self.updatePlot(self.obj[246-self.fibernumberScale.get()]['object'],
                 self.templates[self.templateRadioVar.get()],
                 self.obj[246-self.fibernumberScale.get()]['sky'],
+                self.obj[246-self.fibernumberScale.get()]['error'],
                 self.redshiftScaleVar.get(),
                 tempLabel=os.path.split(templateLabels[
                     self.templateRadioVar.get()])[-1],
