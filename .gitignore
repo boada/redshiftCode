@@ -2,6 +2,7 @@
 *.fits
 *.hdf5
 *.swp
+*.csv
 .DS_Store
 /spec_1d_IRAF/
-
+/pyraf/
