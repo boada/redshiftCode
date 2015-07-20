@@ -1280,14 +1280,15 @@ class App:
         pylab.title(self.objectSpecFileName+' Fiber No. ' +
                 str(self.fibernumberScale.get()))
         pylab.plot(objSED.wavelength, objSED.flux, 'k-')
-        pylab.plot(tempSED.wavelength, tempSED.flux, 'r-', label=tempLabel)
+        pylab.plot(tempSED.wavelength, tempSED.flux, '-', c='#a60628',
+                label=tempLabel)
         pylab.text(0.05, 0.92, "z = %.5f $\pm$ %.5f (Q = %s)" %
                                (tempSED.z,
                                 float(self.redshiftErrorEntryVar.get()),
                                 self.qualityRadioVar.get()),
                    ha='left',
                    va='top',
-                   transform=pylab.gca().transAxes, size=12, color='r')
+                   transform=pylab.gca().transAxes, size=12, color='#a60628')
 
         pylab.ylim(0, 1.2)
 
@@ -1322,7 +1323,7 @@ class App:
                     for i in range(1, len(item)):
                         featureLambda = (1.0 + float(redshift)) * item[i]
                         pylab.plot((featureLambda, featureLambda), (0, 1.0),
-                                   'g--')
+                                   '--', c='#188487')
                         pylab.text(featureLambda, 1.05, featureLabel,
                                    ha='center', va='top', size=10,
                                    rotation='vertical')
@@ -1330,8 +1331,8 @@ class App:
         if redrawSky and self.plotSkyCheckVar.get() == 1:
             if skySED is not None:
                 pylab.plot(skySED.wavelength,
-                           skySED.flux / skySED.flux.max() * 0.3, 'b-',
-                           label='Sky')
+                           skySED.flux / skySED.flux.max() * 0.3, '-',
+                           c='#348abd', label='Sky')
             # Main telluric absorption features
             c = patches.Rectangle((6860, 0), (6930 - 6860), 1.2, fill=True,
                                   edgecolor=(0.8, 0.8, 0.8),
