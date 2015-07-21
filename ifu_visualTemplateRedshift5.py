@@ -674,7 +674,7 @@ class App:
                 fixbad = "y"
             if fixbad == "y":
                 normSkyFlux = self.skySED.flux / self.skySED.flux.max()
-                threshold = 0.25
+                threshold = 0.15
                 badPix = numpy.where(normSkyFlux > threshold)[0]
                 lines = []
                 for i in range(len(badPix)):
@@ -1169,7 +1169,7 @@ class App:
             fixbad = "y"
         if fixbad == "y":
             normSkyFlux = skySED.flux / skySED.flux.max()
-            threshold = 0.25
+            threshold = 0.15
             badPix = numpy.where(normSkyFlux > threshold)[0]
             lines = []
             for i in range(len(badPix)):
