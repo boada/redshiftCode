@@ -26,7 +26,6 @@
 
 import os
 import sys
-import datetime
 import Tkinter
 import pyfits
 import numpy
@@ -37,7 +36,6 @@ from astLib import astSED
 from astLib import astStats
 from astLib import astWCS
 from scipy import optimize
-from scipy import interpolate
 
 pylab.matplotlib.interactive(True)
 
