@@ -36,9 +36,11 @@ def gaussfit( x, y ):
     return fitx, fity, [mu0.value, sig0.value, h0.value]
 
 
+spectrum = 'bcs0000_imcmb3_oextr3_spectrum.fits'
+#spectrum = 'bcs0324_imcmb1_oextr1_spectrum.fits'
 
-data = pyf.getdata('bcs0000_imcmb3_oextr3_spectrum.fits')
-oimg = pyf.open('bcs0000_imcmb3_oextr3_spectrum.fits')
+data = pyf.getdata(spectrum)
+oimg = pyf.open(spectrum)
 
 owavelengthStep = oimg[1].header['CDELT1']
 owavelengthStart = oimg[1].header['CRVAL1']
@@ -50,6 +52,8 @@ owavelengthRange = np.array([owavelengthStart + i * owavelengthStep for i in
 linelist = np.loadtxt('linelist_may13')
 
 total = 0
+center = 0
+res = 0
 for line in linelist:
     mask = (line - 10 <owavelengthRange) & (owavelengthRange < line+10)
     x = owavelengthRange[mask]
@@ -61,9 +65,13 @@ for line in linelist:
     print 'c res', abs(line-params[0]) * (3e5/line)
     print 'res', params[1] * (3e5/params[0])
 
+    res += params[1] * (3e5/params[0])
+    center += abs(line-params[0])
     total += np.sqrt((abs(line-params[0]) * (3e5/line))**2 + (params[1] *
     (3e5/params[0]))**2)
 
-    print 'total', total
 
+print '----'
 print 'avg', total/len(linelist)
+print 'center', center/len(linelist)
+print 'res', res/len(linelist)
