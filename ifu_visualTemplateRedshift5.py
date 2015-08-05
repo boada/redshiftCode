@@ -44,7 +44,7 @@ pylab.matplotlib.interactive(True)
 # al. starburst template
 # which is in a different format and stored under
 # $HOME/Astro_Software/TremontiStarburstTemplate
-tempDir = "./VisualTemplateRedshiftTemplates"
+tempDir = os.environ['HOME']+"/Projects/redshiftCode/VisualTemplateRedshiftTemplates"
 #tremontiFileName=os.environ['HOME']+os.path.sep+"Astro_Software"+os.path.sep+"TremontiStarburstTemplate/fos_ghrs_composite.txt"
 
 templateFileNames = [
@@ -135,9 +135,6 @@ class App:
         self.outDir = outDir
         if not os.path.exists(outDir):
             os.makedirs(outDir)
-        #self.outFile = file(outDir + os.path.sep +
-        #                    datetime.datetime.today().isoformat() +
-        #                    ".results", "w")
         self.outFile = file(outDir + os.path.sep +\
             self.objectSpecFileNames[self.currentSpecFileIndex].rstrip('.fits')
             + ".results", "w")
@@ -672,7 +669,7 @@ class App:
                 fixbad = "y"
             if fixbad == "y":
                 normSkyFlux = self.skySED.flux / self.skySED.flux.max()
-                threshold = 0.15
+                threshold = 0.1
                 badPix = numpy.where(normSkyFlux > threshold)[0]
                 lines = []
                 for i in range(len(badPix)):
@@ -1045,21 +1042,25 @@ class App:
             print 'The ending wavelenghts do not match... Exiting'
             sys.exit(1)
         else:
-            sums = [sum(odata[i,:]) for i in range(odata.shape[0])]
+            # make median sky
+            specs = numpy.array([flux for flux in odata])
+            skySpec = numpy.median(specs, axis=0)
+#            sums = [sum(odata[i,:]) for i in range(odata.shape[0])]
             #find the median value of all the fibers
-            med = astStats.clippedMedianStdev(sums)
-            med = med['clippedMedian']
+#            med = astStats.clippedMedianStdev(sums)
+#            med = med['clippedMedian']
 
-            skyfibers = [i for i in range(odata.shape[0])\
-                    if sum(odata[i,:]) <= med]
-            skydata = odata.take(skyfibers, axis=0)
+#            skyfibers = [i for i in range(odata.shape[0])\
+#                    if sum(odata[i,:]) <= med]
+#            skydata = odata.take(skyfibers, axis=0)
 
-            oskyflux = [numpy.average(skydata[:,i])\
-                    for i in range(skydata.shape[1])]
+#            oskyflux = [numpy.average(skydata[:,i])\
+#                    for i in range(skydata.shape[1])]
 
         RSS = []
         for i in range(int(fiberNumber[1])):
-            oflux = odata[i] - oskyflux
+            #oflux = odata[i] - oskyflux
+            oflux = odata[i] - skySpec
             oErrorFlux = oError[i]
             #oflux = odata[i]
 
@@ -1074,7 +1075,8 @@ class App:
             #objSED.flux = objSED.flux - objSED.flux.min()
             #objSED.flux = objSED.flux / objSED.flux.max()
 
-            skySED = astSED.SED(wavelength=owavelengthRange, flux=oskyflux)
+            #skySED = astSED.SED(wavelength=owavelengthRange, flux=oskyflux)
+            skySED = astSED.SED(wavelength=owavelengthRange, flux=skySpec)
             errSED = astSED.SED(wavelength=owavelengthRange, flux=oErrorFlux)
 
 
@@ -1167,7 +1169,7 @@ class App:
             fixbad = "y"
         if fixbad == "y":
             normSkyFlux = skySED.flux / skySED.flux.max()
-            threshold = 0.15
+            threshold = 0.1
             badPix = numpy.where(normSkyFlux > threshold)[0]
             lines = []
             for i in range(len(badPix)):
@@ -1196,7 +1198,7 @@ class App:
                     else:
                         lastPix = max(badPix)
                     #append the lines and add a little padding
-                    lines.append([badPix[i]-5, lastPix+5])
+                    lines.append([badPix[i]-10, lastPix+10])
 
             for line in lines:
                 # Do a simple linear fit to the end points
@@ -1334,6 +1336,13 @@ class App:
                                   edgecolor=(0.8, 0.8, 0.8),
                                   facecolor=(0.8, 0.8, 0.8), linewidth=1)
             pylab.gca().add_patch(c)
+            for line in open('badlines.dat', 'r'):
+                line = line.split('\t')
+                c = patches.Rectangle((float(line[0]), 0), (float(line[1]) -\
+                    float(line[0])), 1.2, fill=True, edgecolor=(0.8, 0.8, 0.8),
+                                  facecolor=(0.8, 0.8, 0.8), linewidth=1,
+                                  zorder=0)
+                pylab.gca().add_patch(c)
 
         if redrawSky and self.plotErrorCheckVar.get() == 1:
             if errSED is not None:
