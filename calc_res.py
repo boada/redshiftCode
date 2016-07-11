@@ -15,7 +15,7 @@ def fitter(function, parameters, y, x = None):
             p.set(params[i])
             i+=1
         return y - function(x)
-    if x is None: x = arange(y.shape[0])
+    if x is None: x = np.arange(y.shape[0])
     p = [param() for param in parameters]
     opt.leastsq(f, p)
 
